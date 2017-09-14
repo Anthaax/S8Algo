@@ -35,10 +35,10 @@ namespace Algo.Tests
         public void Palindrome_in_string()
         {
             StringAlgo s = new StringAlgo();
-            Assert.IsTrue(s.PermutPalindrome("kayak"));
-            Assert.IsTrue(s.PermutPalindrome("kkaay"));
-            Assert.IsFalse(s.PermutPalindrome("test"));
-            Assert.IsFalse(s.PermutPalindrome("tzest"));
+            Assert.IsTrue(s.IsPalindrome("kayak"));
+            Assert.IsTrue(s.IsPalindrome("kkaay"));
+            Assert.IsFalse(s.IsPalindrome("test"));
+            Assert.IsFalse(s.IsPalindrome("tzest"));
         }
 
         [Test]

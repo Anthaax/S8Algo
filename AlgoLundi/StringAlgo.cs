@@ -75,7 +75,7 @@ namespace AlgoLundi
             return value;
         }
 
-        public bool PermutPalindrome(string value)
+        public bool IsPalindrome(string value)
         {
             Dictionary<char, int> valueDictionnary = new Dictionary<char, int>();
             foreach (var item in value)
