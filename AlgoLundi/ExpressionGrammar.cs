@@ -12,7 +12,7 @@ namespace AlgoLundi
             BaseNode tree = null;
             return BaseGrammar(expression, ref index, ref tree) ? tree : null;
         }
-        private bool BaseGrammar(string expression, ref int index, ref BaseNode tree)
+        private bool BaseGrammar(string expression, ref int index, ref BaseNode tree, bool insideParentheses = false)
         {
             if (expression.Contains(_forbidden)) return false;
             // Char Verification
@@ -34,7 +34,7 @@ namespace AlgoLundi
             // Parentheses Verification
             if (expression[index] == '(')
             {
-                if (!ParenthesesGrammar(expression, ref index, ref tree)) return false;
+                if (!ParenthesesGrammar(expression, ref index, ref tree, insideParentheses)) return false;
                 if (index == expression.Length) return true;
 
             }
@@ -49,7 +49,7 @@ namespace AlgoLundi
                     tree = new SimpleNode("star", tree);
                 else
                     tree = new ComplexNode("concat", (tree as ComplexNode).Left, new SimpleNode("star", (tree as ComplexNode).Rigth));
-                if (!StarGrammar(expression, ref index, ref tree)) return false;
+                if (!StarGrammar(expression, ref index, ref tree, insideParentheses)) return false;
                 if (index == expression.Length) return true;
             }
 
@@ -57,45 +57,53 @@ namespace AlgoLundi
             if (expression[index] == '|')
             {
                 BaseNode secondExpression = null;
-                if (!LogicGrammar(expression, ref index, ref secondExpression)) return false;
+                if (!LogicGrammar(expression, ref index, ref secondExpression, insideParentheses)) return false;
                 ComplexNode complex = new ComplexNode("alt", tree, secondExpression);
                 tree = complex;
                 if (index == expression.Length) return true;
             }
+
+            if (insideParentheses && expression[index] == ')')
+            {
+                return true;
+            }
             return false;
         }
 
-        private bool ParenthesesGrammar(string expression, ref int index, ref BaseNode tree)
+        private bool ParenthesesGrammar(string expression, ref int index, ref BaseNode tree, bool insideParentheses)
         {
             index++;
             BaseNode parentheses = null;
             if (expression[index] == '*' || expression[index] == '|')
                 return false;
-            if (!BaseGrammar(expression, ref index, ref parentheses) && expression[index] == ')')
+            if (BaseGrammar(expression, ref index, ref parentheses, true) && index < expression.Length && expression[index] == ')')
             {
                 index++;
+                if (tree == null)
+                    tree = parentheses;
+                else
+                    tree = new ComplexNode("concat", tree, parentheses);
                 if (index == expression.Length) return true;
-                tree = new ComplexNode("concat", tree, parentheses);
                 if (expression[index] == '*' || expression[index] == '|') return true;
-                return BaseGrammar(expression, ref index, ref tree);
+                return BaseGrammar(expression, ref index, ref tree, insideParentheses);
             }
             return false;
         }
 
-        private bool LogicGrammar(string expression, ref int index, ref BaseNode tree)
+        private bool LogicGrammar(string expression, ref int index, ref BaseNode tree, bool insideParentheses)
         {
             index++;
             if (index == expression.Length) return false;
             if (expression[index] == ')' || expression[index] == '*' || expression[index] == '|') return false;
-            return BaseGrammar(expression, ref index, ref tree);
+            return BaseGrammar(expression, ref index, ref tree, insideParentheses);
         }
 
-        private bool StarGrammar(string expression, ref int index, ref BaseNode tree)
+        private bool StarGrammar(string expression, ref int index, ref BaseNode tree, bool insideParentheses)
         {
             index++;
             if (index == expression.Length) return true;
             if (expression[index] == '*') return false;
-            return BaseGrammar(expression, ref index, ref tree);
+            return BaseGrammar(expression, ref index, ref tree, insideParentheses);
         }
     }
 
